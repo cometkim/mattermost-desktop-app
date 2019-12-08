@@ -2,68 +2,43 @@ open Revery;
 open Revery.UI;
 open Revery.UI.Components;
 
-module AnimatedText = {
-  let%component make = (~delay: Time.t, ~textContent: string, ()) => {
-    let%hook (translate, _state, _reset) =
-      Hooks.animation(
-        Animation.animate(Time.milliseconds(500))
-        |> Animation.delay(delay)
-        |> Animation.ease(Easing.easeOut)
-        |> Animation.tween(50., 0.),
-      );
+module LoginForm = {
+  open Client;
 
-    let%hook (animatedOpacity, _state, _reset) =
-      Hooks.animation(
-        Animation.animate(Time.seconds(1))
-        |> Animation.delay(delay)
-        |> Animation.ease(Easing.easeOut)
-        |> Animation.tween(0., 1.),
-      );
-
-    let textHeaderStyle =
-      Style.[
-        color(Colors.white),
-        fontFamily("Roboto-Regular.ttf"),
-        fontSize(24),
-        transform([Transform.TranslateY(translate)]),
-      ];
-
-    <Opacity opacity=animatedOpacity>
-      <Padding padding=8>
-        <Text style=textHeaderStyle text=textContent />
-      </Padding>
-    </Opacity>;
-  };
-};
-
-module SimpleButton = {
   let%component make = () => {
-    let%hook (count, setCount) = Hooks.state(0);
-    let increment = () => setCount(_ => count + 1);
+    let%hook (id, setId) = Hooks.state("");
+    let%hook (password, setPassword) = Hooks.state("");
+    let%hook (token, setToken) = Hooks.state(None);
 
-    let wrapperStyle =
-      Style.[
-        backgroundColor(Color.rgba(1., 1., 1., 0.1)),
-        border(~width=2, ~color=Colors.white),
-        margin(16),
-      ];
+    let login = () => {
+      let%lwt client =
+        Client.make(~site="http://localhost:8065")
+        |> login(~login_id=id, ~password);
+      setToken(_ => client.token);
+      Lwt.return();
+    };
 
-    let textHeaderStyle =
-      Style.[
-        color(Colors.white),
-        fontFamily("Roboto-Regular.ttf"),
-        fontSize(20),
-      ];
-
-    let textContent = "Click me: " ++ string_of_int(count);
-
-    <Clickable onClick=increment>
-      <View style=wrapperStyle>
-        <Padding padding=4>
-          <Text style=textHeaderStyle text=textContent />
-        </Padding>
-      </View>
-    </Clickable>;
+    <View>
+      <Input value=id onChange={(value, _) => setId(_ => value)} />
+      <Input
+        value=password
+        onChange={(value, _) => setPassword(_ => value)}
+      />
+      <Clickable onClick={() => login() |> ignore}>
+        <View>
+          <Padding padding=4>
+            <Text
+              style=Style.[
+                fontFamily("Roboto-Regular.ttf"),
+                fontSize(14),
+                margin(16),
+              ]
+              text="Login!"
+            />
+          </Padding>
+        </View>
+      </Clickable>
+    </View>;
   };
 };
 
@@ -87,14 +62,10 @@ let init = app => {
 
   let element =
     <View style=containerStyle>
-      <View style=innerStyle>
-        <AnimatedText delay={Time.ms(0)} textContent="Welcome" />
-        <AnimatedText delay={Time.ms(500)} textContent="to" />
-        <AnimatedText delay={Time.ms(1000)} textContent="Revery" />
-      </View>
-      <SimpleButton />
+      <View style=innerStyle> <LoginForm /> </View>
     </View>;
 
+  let _ = Revery_Lwt.startEventLoop();
   let _ = UI.start(win, element);
   ();
 };

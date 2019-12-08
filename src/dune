@@ -1,15 +1,26 @@
 (executable
-    (name App)
     (package App)
-    (preprocess (pps brisk-reconciler.ppx))
-    (js_of_ocaml (javascript_files stubs.js))
+    (name App)
     (public_name App)
+    (js_of_ocaml (javascript_files stubs.js))
     (libraries
-        bigarray
         Revery
-            ))
-
+        Revery.lwt
+        bigarray
+        uri
+        yojson
+        cohttp
+        cohttp-lwt-unix
+        ppx_deriving_yojson.runtime
+    )
+    (preprocess (pps
+        brisk-reconciler.ppx
+        lwt_ppx
+        ppx_deriving_yojson
+    ))
+)
 (install
     (section bin)
     (package AppJs)
-    (files App.bc.js))
+    (files App.bc.js)
+)

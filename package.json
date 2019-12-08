@@ -6,28 +6,29 @@
   "esy": {
     "build": "refmterr dune build -p App",
     "buildsInSource": "_build",
-    "install": [
-      "esy-installer App.install"
-    ]
+    "install": [ "esy-installer App.install" ]
   },
   "revery-packager": {
     "bundleName": "ExampleApp",
     "bundleId": "com.example.app",
     "displayName": "Revery Example App",
     "mainExecutable": "App",
-    "windows": {
-      "packages": ["zip"],
-      "iconFile": "assets/icon.ico"
-    },
+    "windows": { "packages": [ "zip" ], "iconFile": "assets/icon.ico" },
     "darwin": {
-      "packages": ["tar", "dmg"],
+      "packages": [ "tar", "dmg" ],
       "iconFile": "assets/icon.icns"
     },
-    "linux": {
-      "packages": ["tar", "appimage"]
-    }
+    "linux": { "packages": [ "tar", "appimage" ] }
   },
   "dependencies": {
+    "@opam/cohttp": "2.4.0",
+    "@opam/cohttp-lwt": "2.4.0",
+    "@opam/cohttp-lwt-unix": "2.4.0",
+    "@opam/lwt_ppx": "*",
+    "@opam/ppx_deriving": "4.4",
+    "@opam/ppx_deriving_yojson": "3.5.1",
+    "@opam/uri": "3.1.0",
+    "@opam/yojson": "1.7.0",
     "ocaml": "~4.7.0",
     "revery": "0.29.0"
   },
@@ -38,8 +39,8 @@
     "@opam/merlin-extend": "0.4"
   },
   "scripts": {
-   "format": "bash -c \"refmt --in-place *.re\"",
-   "run": "esy x App"
+    "format": "bash -c \"refmt --in-place src/*.re\"",
+    "run": "esy x App"
   },
   "devDependencies": {
     "ocaml": "~4.7.0",
